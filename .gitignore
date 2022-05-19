@@ -1,0 +1,12 @@
+node_modules
+js
+.vscode
+.DS_Store
+
+*.zip
+*.csv
+.terraform
+*.tfstate
+*.backup
+*.tfplan
+/**/*.auto.tfvars.json
