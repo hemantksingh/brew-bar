@@ -1,4 +1,4 @@
-.PHONY: build run test eventbridge destroy-eventbridge lambda destroy-lambda
+.PHONY: build run test stack destroy-stack
 
 build:
 	npm install
@@ -15,10 +15,10 @@ test:
 	cd orders && AWS_REGION=$(REGION) npm test
 
 define tfinit
-	cd $(TERRAFORM_DIR)/$(1) && terraform init
+	cd $(TERRAFORM_DIR) && terraform init
 endef
 
-eventbridge:
+stack:
 	$(call tfinit,$@) && \
 	terraform plan \
 		-var stack_prefix=$(STACK_PREFIX) \
@@ -26,35 +26,14 @@ eventbridge:
 		-var permissions_boundary_policy=$(PERMISSIONS_BOUNDARY_POLICY) \
 		-out $@.tfplan
 ifeq ($(APPLY), true)
-	cd $(TERRAFORM_DIR)/$@ && \
+	cd $(TERRAFORM_DIR) && \
 	terraform apply $@.tfplan
 else
 	@echo Skipping apply ...
 endif
 
-destroy-eventbridge:
-	cd $(TERRAFORM_DIR)/eventbridge && \
-	terraform destroy \
-		-var stack_prefix=$(STACK_PREFIX) \
-		-var region=$(REGION) \
-		-var permissions_boundary_policy=$(PERMISSIONS_BOUNDARY_POLICY)
-
-lambda:
-	$(call tfinit,$@) && \
-	terraform plan \
-		-var stack_prefix=$(STACK_PREFIX) \
-		-var region=$(REGION) \
-		-var permissions_boundary_policy=$(PERMISSIONS_BOUNDARY_POLICY) \
-		-out $@.tfplan
-ifeq ($(APPLY), true)
-	cd $(TERRAFORM_DIR)/$@ && \
-	terraform apply $@.tfplan
-else
-	@echo Skipping apply ...
-endif
-
-destroy-lambda:
-	cd $(TERRAFORM_DIR)/lambda && \
+destroy-stack:
+	cd $(TERRAFORM_DIR) && \
 	terraform destroy \
 		-var stack_prefix=$(STACK_PREFIX) \
 		-var region=$(REGION) \

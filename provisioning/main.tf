@@ -41,7 +41,7 @@ module "eventbridge" {
   attach_cloudwatch_policy = true
 
   cloudwatch_target_arns = [
-    aws_cloudwatch_log_group.orders.arn
+    aws_cloudwatch_log_group.orders_events.arn
   ]
 
   rules = {
@@ -56,7 +56,7 @@ module "eventbridge" {
     orders = [
       {
         name = "log-orders-to-cloudwatch"
-        arn  = aws_cloudwatch_log_group.orders.arn
+        arn  = aws_cloudwatch_log_group.orders_events.arn
       }
     ]
   }
@@ -65,7 +65,7 @@ module "eventbridge" {
 #   role_description = ""
 #   role_name = ""
 #   role_path =""
-    role_permissions_boundary = local.role_permissions_boundary
+    role_permissions_boundary = data.aws_iam_policy.boundary.arn
   
   # insert the 6 required variables here
 
@@ -75,12 +75,13 @@ module "eventbridge" {
   }
 }
 
-resource "random_pet" "this" {
+resource "random_pet" "stack" {
+  prefix = var.stack_prefix
   length = 2
 }
 
-resource "aws_cloudwatch_log_group" "orders" {
-  name = "/aws/events/${local.stack_name}"
+resource "aws_cloudwatch_log_group" "orders_events" {
+  name = "/aws/events/${random_pet.stack.id}"
 
   tags = {
     Environment = var.environment
@@ -89,8 +90,7 @@ resource "aws_cloudwatch_log_group" "orders" {
 }
 
 locals {
-  role_permissions_boundary = data.aws_iam_policy.boundary.arn
-  stack_name = "${var.stack_prefix}-${random_pet.this.id}"
+  stack_name = random_pet.stack.id
 }
 
 data "aws_caller_identity" "current" {
