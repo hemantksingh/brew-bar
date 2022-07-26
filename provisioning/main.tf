@@ -82,7 +82,7 @@ resource "random_pet" "stack" {
 
 resource "aws_cloudwatch_log_group" "orders_events" {
   name = "/aws/events/${random_pet.stack.id}"
-
+  retention_in_days = 30
   tags = {
     Environment = var.environment
     Application = var.application

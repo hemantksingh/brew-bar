@@ -47,7 +47,7 @@ resource "aws_apigatewayv2_route" "orders" {
 
 # define a log group to store access logs for the aws_apigatewayv2_stage.lambda API Gateway stage
 resource "aws_cloudwatch_log_group" "api_gw" {
-  name = "/aws/api_gw/${aws_apigatewayv2_api.lambda.name}"
+  name = "/aws/apigateway/${aws_apigatewayv2_api.lambda.name}"
 
   retention_in_days = 30
 }
