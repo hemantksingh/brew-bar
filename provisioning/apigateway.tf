@@ -1,5 +1,5 @@
 resource "aws_apigatewayv2_api" "public_apigateway" {
-  name          = "${local.stack_name}-gw"
+  name          = "${local.stack_name}-public"
   protocol_type = "HTTP"
 }
 
