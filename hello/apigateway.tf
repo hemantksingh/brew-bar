@@ -1,12 +1,12 @@
-resource "aws_apigatewayv2_api" "public_apigateway" {
-  name          = "${local.stack_name}-public"
+resource "aws_apigatewayv2_api" "lambda" {
+  name          = "serverless_lambda_gw"
   protocol_type = "HTTP"
 }
 
 resource "aws_apigatewayv2_stage" "lambda" {
-  api_id = aws_apigatewayv2_api.public_apigateway.id
+  api_id = aws_apigatewayv2_api.lambda.id
 
-  name        = "brewbar"
+  name        = "serverless_lambda_stage"
   auto_deploy = true
 
   access_log_settings {
@@ -28,37 +28,32 @@ resource "aws_apigatewayv2_stage" "lambda" {
   }
 }
 
-# configure api gateway to use the orders lambda
-resource "aws_apigatewayv2_integration" "orders" {
-  api_id = aws_apigatewayv2_api.public_apigateway.id
+resource "aws_apigatewayv2_integration" "hello_world" {
+  api_id = aws_apigatewayv2_api.lambda.id
 
-  integration_uri    = aws_lambda_function.orders.invoke_arn
+  integration_uri    = aws_lambda_function.hello_world.invoke_arn
   integration_type   = "AWS_PROXY"
   integration_method = "POST"
 }
 
-# map HTTP GET request to a target: lambda 
-resource "aws_apigatewayv2_route" "orders" {
-  api_id = aws_apigatewayv2_api.public_apigateway.id
+resource "aws_apigatewayv2_route" "hello_world" {
+  api_id = aws_apigatewayv2_api.lambda.id
 
-  route_key = "GET /orders"
-  target    = "integrations/${aws_apigatewayv2_integration.orders.id}"
+  route_key = "GET /hello"
+  target    = "integrations/${aws_apigatewayv2_integration.hello_world.id}"
 }
 
-# define a log group to store access logs for the aws_apigatewayv2_stage.lambda API Gateway stage
 resource "aws_cloudwatch_log_group" "api_gw" {
-  name = "/aws/apigateway/${aws_apigatewayv2_api.public_apigateway.name}"
+  name = "/aws/api_gw/${aws_apigatewayv2_api.lambda.name}"
 
   retention_in_days = 30
 }
 
-# give API Gateway permission to invoke your lambda function. This is configured as a resource based 
-# policy on the lambda function
 resource "aws_lambda_permission" "api_gw" {
   statement_id  = "AllowExecutionFromAPIGateway"
   action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.orders.function_name
+  function_name = aws_lambda_function.hello_world.function_name
   principal     = "apigateway.amazonaws.com"
 
-  source_arn = "${aws_apigatewayv2_api.public_apigateway.execution_arn}/*/*"
+  source_arn = "${aws_apigatewayv2_api.lambda.execution_arn}/*/*"
 }

@@ -24,14 +24,13 @@ variable "application" {
 provider "aws" {
   region = var.region
 
-  # Make it faster by skipping something
+  # Make it faster by skipping checks
   skip_get_ec2_platforms      = true
   skip_metadata_api_check     = true
   skip_region_validation      = true
   skip_credentials_validation = true
-  skip_requesting_account_id  = true
+  skip_requesting_account_id  = false
 }
-
 
 module "eventbridge" {
   source  = "terraform-aws-modules/eventbridge/aws"
@@ -75,18 +74,18 @@ module "eventbridge" {
   }
 }
 
-resource "random_pet" "stack" {
-  prefix = var.stack_prefix
-  length = 2
-}
-
 resource "aws_cloudwatch_log_group" "orders_events" {
-  name = "/aws/events/${random_pet.stack.id}"
+  name = "/aws/events/${module.eventbridge.eventbridge_bus_name}"
   retention_in_days = 30
   tags = {
     Environment = var.environment
     Application = var.application
   }
+}
+
+resource "random_pet" "stack" {
+  prefix = var.stack_prefix
+  length = 2
 }
 
 locals {
