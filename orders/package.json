@@ -1,0 +1,14 @@
+{
+  "name": "orders",
+  "version": "1.0.0",
+  "description": "",
+  "main": "orders.js",
+  "scripts": {
+    "test": "node orders.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "aws-sdk": "^2.1178.0"
+  }
+}

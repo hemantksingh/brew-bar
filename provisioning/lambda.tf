@@ -57,6 +57,31 @@ resource "aws_iam_role_policy_attachment" "lambda_policy" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
+resource "aws_iam_policy" "lambda_eventbridge" {
+  name        = "AWSEventBridgeBasic"
+  path        = "/"
+  description = "IAM policy for reading and writing to envent bus from a lambda"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Action = [
+        "events:PutEvents",
+        "events:DescribeRule"
+      ]
+      Effect = "Allow"
+      Sid    = ""
+      Resource = module.eventbridge.eventbridge_bus_arn
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_events" {
+  role       = aws_iam_role.lambda_exec_role.name
+  policy_arn = aws_iam_policy.lambda_eventbridge.arn
+}
+
 resource "aws_cloudwatch_log_group" "orders_lambda" {
   name = "/aws/lambda/${local.stack_name}-orders"
 
