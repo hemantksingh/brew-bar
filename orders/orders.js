@@ -3,24 +3,17 @@ const AWS = require('aws-sdk');
 AWS.config.update({region: process.env.AWS_REGION})
 const eventBridge = new AWS.EventBridge();
 
-console.log(eventBridge);
-
-let firstName = faker.name.firstName();
-let lastName = faker.name.lastName();
-let phoneNumber = faker.phone.phoneNumber();
-let vehicle = faker.vehicle.vehicle();
-
 const params = {
     Entries: [
         {
             Detail: JSON.stringify({
-              firstName: firstName,
-              lastName: lastName,
-              phoneNumber: phoneNumber,
-              vehicle: vehicle,
-              message : "Order placed"
+              orderId: faker.datatype.uuid(),
+              firstName: faker.name.firstName(),
+              lastName: faker.name.lastName(),
+              phoneNumber: faker.phone.phoneNumber(),
+              vehicle: faker.vehicle.vehicle()
             }),
-            DetailType: 'message',
+            DetailType: 'OrderPlaced',
             EventBusName: 'hk-playground-more-sole',
             Source: 'brewbar.orders'
         }
@@ -75,8 +68,8 @@ module.exports.handler = async (event) => {
     }
 }
 
-const main = async () => {
-    await this.handler({});
-}
+// const main = async () => {
+//     await this.handler({});
+// }
 
-main();
+// main();
