@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "aws-sdk": "^2.1178.0"
+    "aws-sdk": "^2.1178.0",
+    "faker": "^5.5.3"
   }
 }
