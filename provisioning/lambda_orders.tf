@@ -16,6 +16,7 @@ resource "aws_s3_object" "lambda_orders" {
 
 resource "aws_lambda_function" "orders" {
   function_name = "${local.stack_name}-orders"
+  description = "Brew bar orders processing"
 
   s3_bucket = aws_s3_bucket.lambda_bucket.id
   s3_key    = aws_s3_object.lambda_orders.key

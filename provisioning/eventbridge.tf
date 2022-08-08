@@ -22,6 +22,10 @@ module "eventbridge" {
       {
         name = "log-orders-to-cloudwatch"
         arn  = aws_cloudwatch_log_group.orders_events.arn
+      },
+      {
+        name = "send orders to delivery"
+        arn = aws_lambda_function.delivery.arn
       }
     ]
   }

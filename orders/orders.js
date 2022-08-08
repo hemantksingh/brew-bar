@@ -11,7 +11,7 @@ const params = {
                 "message" : "Order placed"
             }),
             DetailType: 'message',
-            EventBusName: 'hk-playground-neat-bird',
+            EventBusName: 'hk-playground-more-sole',
             Source: 'brewbar.orders'
         }
     ]
