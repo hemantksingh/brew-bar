@@ -3,7 +3,21 @@ const AWS = require('aws-sdk');
 AWS.config.update({region: process.env.AWS_REGION})
 const eventBridge = new AWS.EventBridge();
 
-const params = {
+// eventBridge.putEvents(params, (err, data) => {
+//     if(data) {
+//         console.log('Event sent ' + JSON.stringify(data.Entries));
+//     } else {
+//         console.log('Failed ' + JSON.stringify(err));
+//     }
+// });
+
+// module.exports.eventHandler = async (event) => {
+//     const result = await eventBridge.putEvents(params).promise()
+//     console.log(result);
+// }
+
+function createOrdersEvent () {
+  return {
     Entries: [
         {
             Detail: JSON.stringify({
@@ -18,20 +32,8 @@ const params = {
             Source: 'brewbar.orders'
         }
     ]
+  };
 }
-
-// eventBridge.putEvents(params, (err, data) => {
-//     if(data) {
-//         console.log('Event sent ' + JSON.stringify(data.Entries));
-//     } else {
-//         console.log('Failed ' + JSON.stringify(err));
-//     }
-// });
-
-// module.exports.eventHandler = async (event) => {
-//     const result = await eventBridge.putEvents(params).promise()
-//     console.log(result);
-// }
 
 function httpHandler(event) {
   let responseMessage = 'Orders Placed!';
@@ -53,7 +55,7 @@ function httpHandler(event) {
 
 module.exports.handler = async (event) => {
     console.log('Event received: ', event);
-    const result = await eventBridge.putEvents(params).promise()
+    const result = await eventBridge.putEvents(createOrdersEvent()).promise()
     console.log(result);
 
     return {
