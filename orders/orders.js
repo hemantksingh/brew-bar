@@ -16,17 +16,11 @@ const eventBridge = new AWS.EventBridge();
 //     console.log(result);
 // }
 
-function createOrdersEvent () {
+function createOrderPlacedEvent (order) {
   return {
     Entries: [
         {
-            Detail: JSON.stringify({
-              orderId: faker.datatype.uuid(),
-              firstName: faker.name.firstName(),
-              lastName: faker.name.lastName(),
-              phoneNumber: faker.phone.phoneNumber(),
-              vehicle: faker.vehicle.vehicle()
-            }),
+            Detail: JSON.stringify(order),
             DetailType: 'OrderPlaced',
             EventBusName: 'hk-playground-more-sole',
             Source: 'brewbar.orders'
@@ -55,7 +49,15 @@ function httpHandler(event) {
 
 module.exports.handler = async (event) => {
     console.log('Event received: ', event);
-    const result = await eventBridge.putEvents(createOrdersEvent()).promise()
+    let orderPlacedEvent = createOrderPlacedEvent({
+      orderId: faker.datatype.uuid(),
+      firstName: faker.name.firstName(),
+      lastName: faker.name.lastName(),
+      phoneNumber: faker.phone.phoneNumber(),
+      vehicle: faker.vehicle.vehicle()
+    });
+    console.log('Publishing order placed event ...');
+    const result = await eventBridge.putEvents(orderPlacedEvent).promise();
     console.log(result);
 
     return {
