@@ -22,7 +22,7 @@ function createOrderPlacedEvent (order) {
         {
             Detail: JSON.stringify(order),
             DetailType: 'OrderPlaced',
-            EventBusName: 'hk-playground-more-sole',
+            EventBusName: process.env.EVENT_BUS_NAME,
             Source: 'brewbar.orders'
         }
     ]
@@ -56,7 +56,7 @@ module.exports.handler = async (event) => {
       phoneNumber: faker.phone.phoneNumber(),
       vehicle: faker.vehicle.vehicle()
     });
-    console.log('Publishing order placed event ...');
+    console.log('Publishing order placed event on ' + process.env.EVENT_BUS_NAME);
     const result = await eventBridge.putEvents(orderPlacedEvent).promise();
     console.log(result);
 
@@ -71,9 +71,3 @@ module.exports.handler = async (event) => {
       }),
     }
 }
-
-// const main = async () => {
-//     await this.handler({});
-// }
-
-// main();

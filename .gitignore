@@ -2,6 +2,7 @@ node_modules
 js
 .vscode
 .DS_Store
+.env
 
 *.zip
 *.csv

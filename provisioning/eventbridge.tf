@@ -52,3 +52,31 @@ resource "aws_cloudwatch_log_group" "orders_events" {
     Application = var.application
   }
 }
+
+resource "null_resource" "post_orders_config" {
+  depends_on = [module.eventbridge]
+  
+  provisioner "local-exec" {
+      command = "rm -f .env && printf \"AWS_REGION=$AWS_REGION\nEVENT_BUS_NAME=$EVENT_BUS_NAME\" >> .env"
+      working_dir = "${path.module}/../orders"
+
+      environment = {
+        AWS_REGION = var.region
+        EVENT_BUS_NAME = module.eventbridge.eventbridge_bus_name
+      }
+    }
+}
+
+resource "null_resource" "post_delivery_config" {
+  depends_on = [module.eventbridge]
+  
+  provisioner "local-exec" {
+      command = "rm -f .env && printf \"AWS_REGION=$AWS_REGION\nEVENT_BUS_NAME=$EVENT_BUS_NAME\" >> .env"
+      working_dir = "${path.module}/../delivery"
+
+      environment = {
+        AWS_REGION = var.region
+        EVENT_BUS_NAME = module.eventbridge.eventbridge_bus_name
+      }
+    }
+}

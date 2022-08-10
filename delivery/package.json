@@ -1,15 +1,15 @@
 {
-  "name": "orders",
+  "name": "delivery",
   "version": "1.0.0",
   "description": "",
-  "main": "orders.js",
+  "main": "delivery.js",
   "scripts": {
-    "test": "node orders.test.js"
+    "test": "node delivery.test.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "aws-sdk": "^2.1178.0",
+    "aws-sdk": "^2.1191.0",
     "faker": "^5.5.3"
   },
   "devDependencies": {

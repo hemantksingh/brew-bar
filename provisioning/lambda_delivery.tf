@@ -28,6 +28,12 @@ resource "aws_lambda_function" "delivery" {
 
   role = aws_iam_role.delivery_lambda_exec_role.arn
 
+  environment {
+    variables = {
+      EVENT_BUS_NAME = module.eventbridge.eventbridge_bus_name
+    }
+  }
+
   depends_on = [
     aws_iam_role_policy_attachment.lambda_logs,
     aws_cloudwatch_log_group.delivery_lambda,
@@ -68,6 +74,11 @@ resource "aws_iam_role_policy_attachment" "delivery_lambda_execution_policy" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
+# Give lambda permission to put events on eventbridge
+resource "aws_iam_role_policy_attachment" "delivery_lambda_events" {
+  role       = aws_iam_role.delivery_lambda_exec_role.name
+  policy_arn = aws_iam_policy.lambda_eventbridge.arn
+}
 
 resource "aws_cloudwatch_log_group" "delivery_lambda" {
   name = "/aws/lambda/${local.stack_name}-delivery"

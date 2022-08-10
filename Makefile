@@ -11,8 +11,9 @@ REGION?=eu-west-1
 STACK_PREFIX?=hk-playground
 TERRAFORM_DIR=provisioning
 
+APP?=orders
 test:
-	cd orders && AWS_REGION=$(REGION) npm test
+	cd $(APP) && npm install && npm test
 
 define tfinit
 	cd $(TERRAFORM_DIR) && terraform init
