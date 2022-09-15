@@ -56,7 +56,7 @@ module.exports.handler = async (event) => {
       phoneNumber: faker.phone.phoneNumber(),
       vehicle: faker.vehicle.vehicle()
     });
-    console.log('Publishing order placed event on ' + process.env.EVENT_BUS_NAME);
+    console.log('Publishing order placed event on event bus: ' + process.env.EVENT_BUS_NAME);
     const result = await eventBridge.putEvents(orderPlacedEvent).promise();
     console.log(result);
 

@@ -31,7 +31,7 @@ module.exports.handler = async (event) => {
         }
     });
 
-    console.log('Publishing order delivered event on ' + process.env.EVENT_BUS_NAME);
+    console.log('Publishing order delivered event on event bus: ' + process.env.EVENT_BUS_NAME);
     const result = await eventBridge.putEvents(deliveryEvent).promise();
     console.log(result);
 
