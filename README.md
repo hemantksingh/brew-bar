@@ -8,3 +8,17 @@ Event driven app that mirrors order processing in a brew bar based on AWS resour
 - The event bus has a rule to dispatch order events to the delivery lambda. You can only create scheduled rules using the default event bus
 
 <img src="./architecture.png" title="Architecture" width="700"/>
+
+## Provision the stack
+
+```sh
+
+make stack APPLY=true
+```
+
+## Post an order
+
+```sh
+cd provisioning
+curl "$(terraform output -raw base_url)/orders"
+```

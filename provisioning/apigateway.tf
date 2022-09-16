@@ -1,5 +1,6 @@
 resource "aws_apigatewayv2_api" "public_apigateway" {
   name          = "${local.stack_name}-public"
+  description   = "External API for handling order processing requests"
   protocol_type = "HTTP"
 }
 

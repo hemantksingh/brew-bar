@@ -26,6 +26,79 @@ resource "aws_api_gateway_method" "delivery_method" {
       "method.request.header.Content-Type" = false
       "method.request.header.X-Amz-Target" = false
   }
+  request_validator_id  = aws_api_gateway_request_validator.delivery_validator.id
+  request_models        = {
+    "application/json" = aws_api_gateway_model.order_delivered_model.name
+  }
+}
+
+resource "aws_api_gateway_request_validator" "delivery_validator" {
+  name                        = "delivery-validator"
+  rest_api_id                 = aws_api_gateway_rest_api.internal_events_api.id
+  validate_request_body       = true
+  validate_request_parameters = true
+}
+
+resource "aws_api_gateway_model" "order_delivered_model" {
+  rest_api_id  = aws_api_gateway_rest_api.internal_events_api.id
+  name         = "orderDeliveredSchema"
+  description  = "Order Delivered JSON schema"
+  content_type = "application/json"
+
+  schema = <<EOF
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "type": "object",
+    "properties": {
+        "ordersDelivered": {
+            "type": "array",
+            "items": [
+                {
+                    "type": "object",
+                    "properties": {
+                        "orderId": {
+                            "type": "string"
+                        },
+                        "address": {
+                            "$ref" : "#/definitions/Address"
+                        }
+                    },
+                    "required": [
+                        "orderId",
+                        "address"
+                    ]
+                }
+            ]
+        }
+    },
+    "required": [
+        "ordersDelivered"
+    ],
+    "definitions": {
+        "Address": {
+            "type": "object",
+            "required": ["line2","city","zipCode","country"],
+            "properties": {
+                "line2": {
+                    "type": "string"
+                },
+                "city": {
+                    "type": "string"
+                },
+                "zipCode": {
+                    "type": "string"
+                },
+                "state": {
+                    "type": "string"
+                },
+                "country": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}
+EOF
 }
 
 resource "aws_api_gateway_method_response" "response_200" {
