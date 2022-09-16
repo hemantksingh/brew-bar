@@ -77,7 +77,7 @@ resource "aws_iam_role_policy_attachment" "delivery_lambda_execution_policy" {
 # Give lambda permission to put events on eventbridge
 resource "aws_iam_role_policy_attachment" "delivery_lambda_events" {
   role       = aws_iam_role.delivery_lambda_exec_role.name
-  policy_arn = aws_iam_policy.lambda_eventbridge.arn
+  policy_arn = aws_iam_policy.eventbridge_basic.arn
 }
 
 resource "aws_cloudwatch_log_group" "delivery_lambda" {
