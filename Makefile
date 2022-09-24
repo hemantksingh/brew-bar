@@ -8,7 +8,7 @@ run:
 	node js/app.js
 
 REGION?=eu-west-1
-STACK_PREFIX?=hk-playground
+STACK_PREFIX?=brewbar
 TERRAFORM_DIR=provisioning
 
 APP?=orders

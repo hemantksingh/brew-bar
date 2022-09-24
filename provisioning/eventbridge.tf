@@ -44,6 +44,11 @@ module "eventbridge" {
   }
 }
 
+resource "aws_schemas_discoverer" "this" {
+  source_arn  = module.eventbridge.eventbridge_bus_arn
+  description = "Auto discover event schemas"
+}
+
 resource "aws_cloudwatch_log_group" "orders_events" {
   name = "/aws/events/${module.eventbridge.eventbridge_bus_name}"
   retention_in_days = 30
