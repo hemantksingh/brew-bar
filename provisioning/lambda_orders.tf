@@ -67,7 +67,7 @@ resource "aws_iam_role_policy_attachment" "lambda_policy" {
 resource "aws_iam_policy" "eventbridge_basic" {
   name        = "AWSEventBridgeBasic"
   path        = "/"
-  description = "IAM policy for reading and writing to event bus"
+  description = "Allows putting events and describing rules on the specified event bus"
 
   policy = jsonencode({
     Version = "2012-10-17"

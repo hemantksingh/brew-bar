@@ -1,5 +1,5 @@
 # Amazon API Gateway Version 2 resources are used for creating and deploying WebSocket and HTTP APIs,
-# therefore Amazon API Gateway Version 1 resources are used for creating and deploying REST APIs
+# therefore for creating and deploying REST APIs, Amazon API Gateway Version 1 resources are used
 resource "aws_api_gateway_rest_api" "internal_events_api" {
   name          = "${local.stack_name}-internal-events-api"
   description   = "Internal API for validating and enriching events before routing them to event bridge"
@@ -194,6 +194,23 @@ resource "aws_api_gateway_stage" "dev" {
   stage_name    = "dev"
 }
 
+resource "aws_api_gateway_method_settings" "all" {
+  rest_api_id = aws_api_gateway_rest_api.internal_events_api.id
+  stage_name  = aws_api_gateway_stage.dev.stage_name
+  method_path = "*/*"
+
+  settings {
+    data_trace_enabled = true # full request and response logs
+    metrics_enabled = true # enable Detailed CloudWatch Metrics
+    # Based on https://docs.aws.amazon.com/apigateway/latest/developerguide/view-cloudwatch-log-events-in-cloudwatch-console.html 
+    # the logs can be viewed in the API-Gateway-Execution-Logs_{rest-api-id}/{stage-name} log group in CloudWatch 
+    logging_level   = "INFO" 
+
+    # limit the rate of calls to prevent abuse and unwanted charges
+    throttling_rate_limit  = 100
+    throttling_burst_limit = 50
+  }
+}
 
 # API gateway role with permissions to put events on event bridge
 resource "aws_iam_role" "internal_events_api_role" {
@@ -215,7 +232,18 @@ resource "aws_iam_role" "internal_events_api_role" {
   permissions_boundary = data.aws_iam_policy.boundary.arn
 }
 
-resource "aws_iam_role_policy_attachment" "apigateway_policy" {
+resource "aws_iam_role_policy_attachment" "apigateway_eventbridge_policy" {
   role       = aws_iam_role.internal_events_api_role.name
   policy_arn = aws_iam_policy.eventbridge_basic.arn
+}
+
+resource "aws_iam_role_policy_attachment" "apigateway_cloudwatch_policy" {
+  role       = aws_iam_role.internal_events_api_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs"
+}
+
+# define the account wide CloudWatch permissions for the API Gateway per region. 
+# This setting applies to all the API Gateways in the selected region.
+resource "aws_api_gateway_account" "this" {
+  cloudwatch_role_arn = aws_iam_role.internal_events_api_role.arn
 }
