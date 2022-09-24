@@ -8,7 +8,7 @@ Event driven app that mirrors order processing in a brew bar based on AWS resour
 - The event bus has a rule to dispatch order events to the delivery lambda. You can only create scheduled rules using the default event bus
 - EventBridge has a hard limit on the event size at 265 KB
 
-<img src="./architecture.png" title="Event Driven Architecture" width="700"/>
+<img src="./architecture.png" title="Event Driven Architecture" height="450" width="800"/>
 
 ## Provision the stack
 
