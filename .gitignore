@@ -11,3 +11,4 @@ js
 *.backup
 *.tfplan
 /**/*.auto.tfvars.json
+__pycache__
