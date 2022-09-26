@@ -21,7 +21,7 @@ resource "aws_lambda_function" "orders" {
   s3_bucket = aws_s3_bucket.lambda_bucket.id
   s3_key    = aws_s3_object.lambda_orders.key
 
-  runtime = "nodejs12.x"
+  runtime = "nodejs16.x"
   handler = "orders.handler"
 
   source_code_hash = data.archive_file.lambda_orders.output_base64sha256

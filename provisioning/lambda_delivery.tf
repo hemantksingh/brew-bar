@@ -21,7 +21,7 @@ resource "aws_lambda_function" "delivery" {
   s3_bucket = aws_s3_bucket.lambda_bucket.id
   s3_key    = aws_s3_object.lambda_delivery.key
 
-  runtime = "nodejs12.x"
+  runtime = "nodejs16.x"
   handler = "delivery.handler"
 
   source_code_hash = data.archive_file.lambda_delivery.output_base64sha256
