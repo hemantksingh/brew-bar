@@ -26,3 +26,18 @@ make destroy-stack
 cd provisioning
 curl "$(terraform output -raw base_url)/orders"
 ```
+
+## Run load tests
+
+- Pre requisites - Install [pipenv](https://packaging.python.org/en/latest/tutorials/managing-dependencies/)
+
+    ```sh
+    python3 -m pip install --user pipenv
+    ```
+
+- Run load test
+  
+    ```sh
+    cd tests/loadtests
+    pipenv run locust
+    ```

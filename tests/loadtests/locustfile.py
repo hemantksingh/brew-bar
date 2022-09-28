@@ -1,6 +1,8 @@
 import json
 import os
+import uuid
 from locust import HttpUser, task, between
+from faker import Faker
 from config  import Config
 
 # An instance of this class is created for every user that locust simulates, 
@@ -25,18 +27,21 @@ class DeliveryUser(HttpUser):
 
     @task
     def deliveries(self):
-        # client is an instance of HttpSession provided by inheriting from HttpUser
-        self.client.post("/delivery", json={
-            "ordersDelivered": [
+        fake = Faker()
+        ordersDelivered = {
+            "ordersDelivered" : [
                 {
-                    "orderId": "a0874e2c-4ad3-4fda-8145-18cc51616ecd",
-                    "address": {
-                        "line2": "10 Broad Road",
-                        "city": "Altrincham",
-                        "zipCode": "WA15 7PC",
-                        "state": "Cheshire",
-                        "country": "United Kingdom"
+                    "orderId" : str(uuid.uuid4()),
+                    "address" : {
+                        "line2" : fake.street_address(),
+                        "city" : fake.city(),
+                        "zipCode" : fake.postcode(),
+                        "state" : fake.city_suffix(),
+                        "country" : fake.country()
                     }
                 }
             ]
-        })
+        }
+        print(json.dumps(ordersDelivered))
+        # client is an instance of HttpSession provided by inheriting from HttpUser
+        self.client.post("/delivery", json= ordersDelivered)
