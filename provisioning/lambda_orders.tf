@@ -92,7 +92,7 @@ resource "aws_iam_role_policy_attachment" "lambda_events" {
 resource "aws_cloudwatch_log_group" "orders_lambda" {
   name = "/aws/lambda/${local.stack_name}-orders"
 
-  retention_in_days = 30
+  retention_in_days = 7
 }
 
 resource "aws_iam_policy" "lambda_logging" {

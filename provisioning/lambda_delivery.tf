@@ -83,7 +83,7 @@ resource "aws_iam_role_policy_attachment" "delivery_lambda_events" {
 resource "aws_cloudwatch_log_group" "delivery_lambda" {
   name = "/aws/lambda/${local.stack_name}-delivery"
 
-  retention_in_days = 30
+  retention_in_days = 7
 }
 
 resource "aws_iam_policy" "delivery_lambda_logging" {

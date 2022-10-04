@@ -50,7 +50,7 @@ resource "aws_apigatewayv2_route" "orders" {
 resource "aws_cloudwatch_log_group" "api_gw" {
   name = "/aws/apigateway/${aws_apigatewayv2_api.public_apigateway.name}"
 
-  retention_in_days = 30
+  retention_in_days = 7
 }
 
 # give API Gateway permission to invoke your lambda function. This is configured as a resource based 
