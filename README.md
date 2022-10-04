@@ -39,5 +39,6 @@ curl "$(terraform output -raw base_url)/orders"
   
     ```sh
     cd tests/loadtests
+    pipenv install
     pipenv run locust
     ```
