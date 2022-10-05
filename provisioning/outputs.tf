@@ -13,17 +13,22 @@ output "lambda_bucket_name" {
   value = aws_s3_bucket.lambda_bucket.id
 }
 
-output "lambda_function_name" {
-  description = "Name of the Lambda function."
+output "orders_lambda_function_name" {
+  description = "Name of the Orders processing Lambda function."
   value = aws_lambda_function.orders.function_name
 }
 
-output "base_url" {
-  description = "Base URL for API Gateway stage."
-  value = aws_apigatewayv2_stage.lambda.invoke_url
+output "delivery_lambda_function_name" {
+  description = "Name of the Delivery processing Lambda function."
+  value = aws_lambda_function.delivery.function_name
+}
+
+output "orders_api_url" {
+  description = "URL for public Orders API."
+  value = aws_api_gateway_stage.brewbar.invoke_url
 }
 
 output "internal_events_api_url" {
   description = "URL for Internal Gateway events API."
-  value = aws_api_gateway_stage.dev.invoke_url
+  value = aws_api_gateway_stage.events.invoke_url
 }

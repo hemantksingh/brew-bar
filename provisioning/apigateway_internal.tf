@@ -5,7 +5,7 @@ resource "aws_api_gateway_rest_api" "internal_events_api" {
   description   = "Internal API for validating and enriching events before routing them to event bridge"
 }
 
-resource "aws_api_gateway_resource" "delivery_resource" {
+resource "aws_api_gateway_resource" "delivered_resource" {
   rest_api_id = aws_api_gateway_rest_api.internal_events_api.id
   parent_id   = aws_api_gateway_rest_api.internal_events_api.root_resource_id
   path_part   = "delivery"
@@ -17,23 +17,23 @@ resource "aws_api_gateway_resource" "delivery_resource" {
 #   path_part   = "order"
 # }
 
-resource "aws_api_gateway_method" "delivery_method" {
+resource "aws_api_gateway_method" "delivered_method" {
   rest_api_id   = aws_api_gateway_rest_api.internal_events_api.id
-  resource_id   = aws_api_gateway_resource.delivery_resource.id
+  resource_id   = aws_api_gateway_resource.delivered_resource.id
   http_method   = "POST"
   authorization = "NONE"
   request_parameters   = {
       "method.request.header.Content-Type" = false
       "method.request.header.X-Amz-Target" = false
   }
-  request_validator_id  = aws_api_gateway_request_validator.delivery_validator.id
+  request_validator_id  = aws_api_gateway_request_validator.delivered_validator.id
   request_models        = {
     "application/json" = aws_api_gateway_model.order_delivered_model.name
   }
 }
 
-resource "aws_api_gateway_request_validator" "delivery_validator" {
-  name                        = "delivery-validator"
+resource "aws_api_gateway_request_validator" "delivered_validator" {
+  name                        = "delivered-validator"
   rest_api_id                 = aws_api_gateway_rest_api.internal_events_api.id
   validate_request_body       = true
   validate_request_parameters = true
@@ -101,10 +101,10 @@ resource "aws_api_gateway_model" "order_delivered_model" {
 EOF
 }
 
-resource "aws_api_gateway_method_response" "response_200" {
+resource "aws_api_gateway_method_response" "delivered_response_200" {
     rest_api_id         = aws_api_gateway_rest_api.internal_events_api.id
-    resource_id         = aws_api_gateway_resource.delivery_resource.id
-    http_method         = aws_api_gateway_method.delivery_method.http_method
+    resource_id         = aws_api_gateway_resource.delivered_resource.id
+    http_method         = aws_api_gateway_method.delivered_method.http_method
     response_models     = {
         "application/json" = "Empty"
     }
@@ -112,10 +112,10 @@ resource "aws_api_gateway_method_response" "response_200" {
     status_code         = "200"
 }
 
-resource "aws_api_gateway_integration" "delivery_integration" {
+resource "aws_api_gateway_integration" "delivered_integration" {
   rest_api_id             = aws_api_gateway_rest_api.internal_events_api.id
-  resource_id             = aws_api_gateway_resource.delivery_resource.id
-  http_method             = aws_api_gateway_method.delivery_method.http_method
+  resource_id             = aws_api_gateway_resource.delivered_resource.id
+  http_method             = aws_api_gateway_method.delivered_method.http_method
   type                    = "AWS"
   integration_http_method = "POST"
   uri                     = "arn:aws:apigateway:${var.region}:events:action/PutEvents"
@@ -150,10 +150,10 @@ resource "aws_api_gateway_integration" "delivery_integration" {
   }
 }
 
-resource "aws_api_gateway_integration_response" "this" {
+resource "aws_api_gateway_integration_response" "delivered_response" {
   rest_api_id          = aws_api_gateway_rest_api.internal_events_api.id
-  resource_id          = aws_api_gateway_resource.delivery_resource.id
-  http_method         = aws_api_gateway_method.delivery_method.http_method
+  resource_id          = aws_api_gateway_resource.delivered_resource.id
+  http_method         = aws_api_gateway_method.delivered_method.http_method
   response_templates  = {
       "application/json" = <<-EOT
           #set($inputRoot = $input.path('$'))
@@ -161,11 +161,11 @@ resource "aws_api_gateway_integration_response" "this" {
         }
       EOT
   }
-  status_code         = aws_api_gateway_method_response.response_200.status_code
-  depends_on = [aws_api_gateway_integration.delivery_integration]
+  status_code         = aws_api_gateway_method_response.delivered_response_200.status_code
+  depends_on = [aws_api_gateway_integration.delivered_integration]
 }
 
-resource "aws_api_gateway_deployment" "this" {
+resource "aws_api_gateway_deployment" "delivered" {
   rest_api_id = aws_api_gateway_rest_api.internal_events_api.id
 
   triggers = {
@@ -177,9 +177,9 @@ resource "aws_api_gateway_deployment" "this" {
     #       resources will show a difference after the initial implementation.
     #       It will stabilize to only change when resources change afterwards.
     redeployment = sha1(jsonencode([
-      aws_api_gateway_resource.delivery_resource.id,
-      aws_api_gateway_method.delivery_method.id,
-      aws_api_gateway_integration.delivery_integration.id,
+      aws_api_gateway_resource.delivered_resource.id,
+      aws_api_gateway_method.delivered_method.id,
+      aws_api_gateway_integration.delivered_integration.id,
     ]))
   }
 
@@ -188,15 +188,15 @@ resource "aws_api_gateway_deployment" "this" {
   }
 }
 
-resource "aws_api_gateway_stage" "dev" {
-  deployment_id = aws_api_gateway_deployment.this.id
+resource "aws_api_gateway_stage" "events" {
+  deployment_id = aws_api_gateway_deployment.delivered.id
   rest_api_id   = aws_api_gateway_rest_api.internal_events_api.id
-  stage_name    = "dev"
+  stage_name    = "events"
 }
 
-resource "aws_api_gateway_method_settings" "all" {
+resource "aws_api_gateway_method_settings" "delivered" {
   rest_api_id = aws_api_gateway_rest_api.internal_events_api.id
-  stage_name  = aws_api_gateway_stage.dev.stage_name
+  stage_name  = aws_api_gateway_stage.events.stage_name
   method_path = "*/*"
 
   settings {
@@ -232,12 +232,12 @@ resource "aws_iam_role" "internal_events_api_role" {
   permissions_boundary = data.aws_iam_policy.boundary.arn
 }
 
-resource "aws_iam_role_policy_attachment" "apigateway_eventbridge_policy" {
+resource "aws_iam_role_policy_attachment" "internal_apigateway_eventbridge_policy" {
   role       = aws_iam_role.internal_events_api_role.name
   policy_arn = aws_iam_policy.eventbridge_basic.arn
 }
 
-resource "aws_iam_role_policy_attachment" "apigateway_cloudwatch_policy" {
+resource "aws_iam_role_policy_attachment" "internal_apigateway_cloudwatch_policy" {
   role       = aws_iam_role.internal_events_api_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs"
 }

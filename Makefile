@@ -1,4 +1,4 @@
-.PHONY: build run test stack destroy-stack
+.PHONY: build run test loadtest stack destroy-stack
 
 build:
 	npm install
@@ -14,6 +14,10 @@ TERRAFORM_DIR=provisioning
 APP?=orders
 test:
 	cd $(APP) && npm install && npm test
+
+loadtest:
+	cd tests/loadtests && \
+	pipenv run locust
 
 define tfinit
 	cd $(TERRAFORM_DIR) && terraform init
