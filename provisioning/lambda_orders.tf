@@ -16,7 +16,7 @@ resource "aws_lambda_function" "orders" {
   s3_key    = aws_s3_object.lambda_orders.key
 
   runtime = "nodejs16.x"
-  handler = "orders.handler"
+  handler = "orders.lambdaHandler"
 
   source_code_hash = filebase64sha256("${path.module}/../orders.zip")
 
