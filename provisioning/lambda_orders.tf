@@ -1,17 +1,11 @@
-data "archive_file" "lambda_orders" {
-  type = "zip"
-
-  source_dir  = "${path.module}/../orders"
-  output_path = "${path.module}/../orders.zip"
-}
 
 resource "aws_s3_object" "lambda_orders" {
   bucket = aws_s3_bucket.lambda_bucket.id
 
   key    = "orders.zip"
-  source = data.archive_file.lambda_orders.output_path
+  source = "${path.module}/../orders.zip"
 
-  etag = filemd5(data.archive_file.lambda_orders.output_path)
+  etag = filemd5("${path.module}/../orders.zip")
 }
 
 resource "aws_lambda_function" "orders" {
@@ -24,7 +18,7 @@ resource "aws_lambda_function" "orders" {
   runtime = "nodejs16.x"
   handler = "orders.handler"
 
-  source_code_hash = data.archive_file.lambda_orders.output_base64sha256
+  source_code_hash = filebase64sha256("${path.module}/../orders.zip")
 
   role = aws_iam_role.lambda_exec_role.arn
 

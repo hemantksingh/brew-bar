@@ -3,7 +3,7 @@ js
 .vscode
 .DS_Store
 .env
-
+dist
 *.zip
 *.csv
 .terraform
