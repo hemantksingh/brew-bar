@@ -25,6 +25,7 @@ resource "aws_lambda_function" "orders" {
    environment {
     variables = {
       EVENT_BUS_NAME = module.eventbridge.eventbridge_bus_name
+      INTERNAL_EVENTS_API_URI = aws_api_gateway_stage.events.invoke_url
     }
   }
 

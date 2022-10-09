@@ -180,6 +180,9 @@ resource "aws_api_gateway_deployment" "delivered" {
       aws_api_gateway_resource.delivered_resource.id,
       aws_api_gateway_method.delivered_method.id,
       aws_api_gateway_integration.delivered_integration.id,
+      aws_api_gateway_resource.orderplaced_resource.id,
+      aws_api_gateway_method.orderplaced_method.id,
+      aws_api_gateway_integration.orderplaced_integration.id
     ]))
   }
 
