@@ -1,17 +1,14 @@
-data "archive_file" "lambda_delivery" {
-  type = "zip"
-
-  source_dir  = "${path.module}/../delivery"
-  output_path = "${path.module}/../delivery.zip"
+locals {
+  delivery_package = "${path.module}/../delivery.zip"
 }
 
 resource "aws_s3_object" "lambda_delivery" {
   bucket = aws_s3_bucket.lambda_bucket.id
 
   key    = "delivery.zip"
-  source = data.archive_file.lambda_delivery.output_path
+  source = local.delivery_package
 
-  etag = filemd5(data.archive_file.lambda_delivery.output_path)
+  etag = filemd5(local.delivery_package)
 }
 
 resource "aws_lambda_function" "delivery" {
@@ -22,15 +19,16 @@ resource "aws_lambda_function" "delivery" {
   s3_key    = aws_s3_object.lambda_delivery.key
 
   runtime = "nodejs16.x"
-  handler = "delivery.handler"
+  handler = "delivery.lambdaHandler"
 
-  source_code_hash = data.archive_file.lambda_delivery.output_base64sha256
+  source_code_hash = filebase64sha256(local.delivery_package)
 
   role = aws_iam_role.delivery_lambda_exec_role.arn
 
   environment {
     variables = {
       EVENT_BUS_NAME = module.eventbridge.eventbridge_bus_name
+      INTERNAL_EVENTS_API_URI = aws_api_gateway_stage.events.invoke_url
     }
   }
 

@@ -10,7 +10,18 @@ Event driven app that mirrors order processing in a brew bar based on AWS resour
 
 <img src="./architecture.png" title="Event Driven Architecture" height="450" width="800"/>
 
-## Provision the stack
+## Build the apps (lambda functions)
+
+The apps are built using `esbuild` and packaged with `zip` as detailed [here](https://docs.aws.amazon.com/lambda/latest/dg/typescript-package.html)
+
+```sh
+make build APP=orders
+make build APP=delivery
+```
+
+## Deploy the stack
+
+The infrastructure and apps are deployed using `terraform`
 
 ```sh
 # Provision the stack
@@ -20,11 +31,11 @@ make stack APPLY=true
 make destroy-stack
 ```
 
-## Post an order
+## Get orders
 
 ```sh
 cd provisioning
-curl "$(terraform output -raw base_url)/orders"
+curl "$(terraform output -raw orders_api_url)/orders"
 ```
 
 ## Run load tests

@@ -1,23 +1,26 @@
 .PHONY: build run test loadtest stack destroy-stack
 
+APP?=orders
+
 build:
-	npm install
-	./node_modules/typescript/bin/tsc
+	cd $(APP) && \
+	npm install && \
+	npm run build
 
 run:
 	node js/app.js
 
-REGION?=eu-west-1
-STACK_PREFIX?=brewbar
-TERRAFORM_DIR=provisioning
-
-APP?=orders
 test:
 	cd $(APP) && npm install && npm test
 
 loadtest:
 	cd tests/loadtests && \
 	pipenv run locust
+
+REGION?=eu-west-1
+STACK_PREFIX?=brewbar
+TERRAFORM_DIR=provisioning
+
 
 define tfinit
 	cd $(TERRAFORM_DIR) && terraform init
