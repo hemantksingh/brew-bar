@@ -116,11 +116,11 @@ resource "aws_api_gateway_integration" "orderplaced_integration" {
         "application/json" = <<-EOT
             #set($context.requestOverride.header.X-Amz-Target = "AWSEvents.PutEvents")
             #set($context.requestOverride.header.Content-Type = "application/x-amz-json-1.1")            
-            #set($inputRoot = $input.path('$')) 
+            #set($inputRoot = $input.path('$'))
             { 
               "Entries": [
                 {
-                  "Detail": "$util.toJson($inputRoot)",
+                  "Detail": "$util.escapeJavaScript($input.json('$')).replaceAll("\\'","'")",
                   "DetailType": "OrderPlaced",
                   "EventBusName": "${module.eventbridge.eventbridge_bus_name}",
                   "Source":"brewbar.orders"
