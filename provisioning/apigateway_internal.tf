@@ -24,7 +24,7 @@ resource "aws_api_gateway_deployment" "deployment" {
       aws_api_gateway_resource.orderplaced_resource.id,
       aws_api_gateway_method.orderplaced_method.id,
       aws_api_gateway_integration.orderplaced_integration.id,
-      aws_api_gateway_model.order_placed_model.id
+      aws_api_gateway_model.orderplaced_model.id
     ]))
   }
 

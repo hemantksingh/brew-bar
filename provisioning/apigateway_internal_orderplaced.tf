@@ -15,7 +15,7 @@ resource "aws_api_gateway_method" "orderplaced_method" {
   }
   request_validator_id  = aws_api_gateway_request_validator.orderpalced_validator.id
   request_models        = {
-    "application/json" = aws_api_gateway_model.order_placed_model.name
+    "application/json" = aws_api_gateway_model.orderplaced_model.name
   }
 }
 
@@ -26,7 +26,7 @@ resource "aws_api_gateway_request_validator" "orderpalced_validator" {
   validate_request_parameters = true
 }
 
-resource "aws_api_gateway_model" "order_placed_model" {
+resource "aws_api_gateway_model" "orderplaced_model" {
   rest_api_id  = aws_api_gateway_rest_api.internal_events_api.id
   name         = "OrderPlacedSchema"
   description  = "Order Placed JSON schema"

@@ -1,14 +1,14 @@
 locals {
-  package_source = "${path.module}/../delivery.zip"
+  delivery_package = "${path.module}/../delivery.zip"
 }
 
 resource "aws_s3_object" "lambda_delivery" {
   bucket = aws_s3_bucket.lambda_bucket.id
 
   key    = "delivery.zip"
-  source = local.package_source
+  source = local.delivery_package
 
-  etag = filemd5(local.package_source)
+  etag = filemd5(local.delivery_package)
 }
 
 resource "aws_lambda_function" "delivery" {
@@ -21,7 +21,7 @@ resource "aws_lambda_function" "delivery" {
   runtime = "nodejs16.x"
   handler = "delivery.lambdaHandler"
 
-  source_code_hash = filebase64sha256(local.package_source)
+  source_code_hash = filebase64sha256(local.delivery_package)
 
   role = aws_iam_role.delivery_lambda_exec_role.arn
 

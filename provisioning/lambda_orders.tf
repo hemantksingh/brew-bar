@@ -1,11 +1,15 @@
 
+locals {
+  orders_package = "${path.module}/../orders.zip"
+}
+
 resource "aws_s3_object" "lambda_orders" {
   bucket = aws_s3_bucket.lambda_bucket.id
 
   key    = "orders.zip"
-  source = "${path.module}/../orders.zip"
+  source = local.orders_package
 
-  etag = filemd5("${path.module}/../orders.zip")
+  etag = filemd5(local.orders_package)
 }
 
 resource "aws_lambda_function" "orders" {
@@ -18,7 +22,7 @@ resource "aws_lambda_function" "orders" {
   runtime = "nodejs16.x"
   handler = "orders.lambdaHandler"
 
-  source_code_hash = filebase64sha256("${path.module}/../orders.zip")
+  source_code_hash = filebase64sha256(local.orders_package)
 
   role = aws_iam_role.lambda_exec_role.arn
 
