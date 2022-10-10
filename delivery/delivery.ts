@@ -1,13 +1,14 @@
-import { Context, APIGatewayProxyCallback, APIGatewayEvent } from 'aws-lambda';
+import { Context, APIGatewayProxyCallback, APIGatewayEvent, EventBridgeEvent } from 'aws-lambda';
 import AWS from 'aws-sdk';
 import axios from 'axios';
-import { v4 as uuidv4 } from 'uuid';
 
-type OrderPlacedEvent = {
+
+type OrderDeliveredEvent = {
     orderId: string;
     firstName: string;
     lastName: string;
     phoneNumber: string;
+    dispatchedOn: string;
     address: Address;
 }
 
@@ -20,7 +21,7 @@ type Address = {
     country: string;
 }
 
-export const lambdaHandler = (event: APIGatewayEvent, context: Context, callback: APIGatewayProxyCallback): void => {
+export const lambdaHandler = (event: EventBridgeEvent<any, any>, context: Context, callback: APIGatewayProxyCallback): void => {
     console.log(`Event: ${JSON.stringify(event, null, 2)}`);
     console.log(`Context: ${JSON.stringify(context, null, 2)}`);
 
@@ -28,17 +29,18 @@ export const lambdaHandler = (event: APIGatewayEvent, context: Context, callback
     // deduplicate and persist the order
     // const docClient = new AWS.DynamoDB.DocumentClient();
 
-    if (event?.body == null)
-        throw new Error("Event body cannot be null");
+    if (event?.detail == null)
+        throw new Error("Event detail cannot be null");
 
-    // publish orderPlaced event
-    let order = JSON.parse(event.body);
+    const now = new Date();
+    // publish orderDelivered event
     publishEvent({
-        orderId: uuidv4(),
-        firstName: order.firstName,
-        lastName: order.lastName,
-        phoneNumber: order.phoneNumber,
-        address: order.address
+        orderId: event.detail.orderId,
+        firstName: event.detail.firstName,
+        lastName: event.detail.lastName,
+        phoneNumber: event.detail.phoneNumber,
+        dispatchedOn: now.toUTCString(),
+        address: event.detail.address
     });
 
     callback(null, {
@@ -54,11 +56,11 @@ export const lambdaHandler = (event: APIGatewayEvent, context: Context, callback
 };
 
 
-async function publishEvent(event: OrderPlacedEvent) {
+async function publishEvent(event: OrderDeliveredEvent) {
     try {
-        const orderPlacedUri = `${process.env.INTERNAL_EVENTS_API_URI}/order-placed`;
-        console.log(`Sending event ${JSON.stringify(event)} to ${orderPlacedUri}`);
-        await axios.post(orderPlacedUri, event, {
+        const orderDeliveredUri = `${process.env.INTERNAL_EVENTS_API_URI}/order-delivered`;
+        console.log(`Sending event ${JSON.stringify(event)} to ${orderDeliveredUri}`);
+        await axios.post(orderDeliveredUri, event, {
             headers: {
                 'Content-Type': 'application/json',
                 Accept: 'application/json',

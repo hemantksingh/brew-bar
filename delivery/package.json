@@ -4,15 +4,23 @@
   "description": "",
   "main": "delivery.js",
   "scripts": {
+    "prebuild": "rm -rf dist && tsc",
+    "build": "esbuild delivery.ts --bundle --minify --sourcemap --platform=node --target=es2020 --outfile=dist/delivery.js",
+    "postbuild": "cd dist && zip -r ../../delivery.zip delivery.js*",
     "test": "node delivery.test.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "aws-sdk": "^2.1191.0",
+    "aws-sdk": "^2.1231.0",
+    "axios": "^1.1.2",
     "faker": "^5.5.3"
   },
   "devDependencies": {
-    "dotenv": "^16.0.1"
+    "@types/aws-lambda": "^8.10.106",
+    "@types/node": "^18.8.3",
+    "dotenv": "^16.0.1",
+    "esbuild": "^0.15.10",
+    "typescript": "^4.8.4"
   }
 }
