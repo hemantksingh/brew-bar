@@ -1,4 +1,4 @@
-.PHONY: build run test loadtest stack destroy-stack
+.PHONY: build run test loadtest stack destroy-stack output
 
 APP?=orders
 
@@ -46,3 +46,7 @@ destroy-stack:
 		-var stack_prefix=$(STACK_PREFIX) \
 		-var region=$(REGION) \
 		-var permissions_boundary_policy=$(PERMISSIONS_BOUNDARY_POLICY)
+
+output:
+	cd $(TERRAFORM_DIR) && \
+	terraform output

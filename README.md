@@ -49,7 +49,12 @@ curl "$(terraform output -raw orders_api_url)/orders"
 - Run load test
   
     ```sh
-    cd tests/loadtests
-    pipenv install
-    pipenv run locust
+    # get ORDERS_API_ID by loading terraform output
+    make output
+
+    # Terraform out put looks like:
+    # orders_api_url = "https://e60e2y07o4.execute-api.eu-west-1.amazonaws.com/brewbar
+
+    # run the load test
+    make loadtest ORDERS_API_ID=e60e2y07o4
     ```
