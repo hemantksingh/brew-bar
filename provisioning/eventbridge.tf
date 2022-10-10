@@ -49,6 +49,29 @@ resource "aws_schemas_discoverer" "this" {
   description = "Auto discover event schemas"
 }
 
+# This policy can be used to give permissions to other resources (e.g. lambda, apigateway)
+# to put events on eventbridge
+resource "aws_iam_policy" "eventbridge_basic" {
+  name        = "AWSEventBridgeBasic"
+  path        = "/"
+  description = "Allows putting events and describing rules on the specified event bus"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Action = [
+        "events:PutEvents",
+        "events:DescribeRule"
+      ]
+      Effect = "Allow"
+      Sid    = ""
+      Resource = module.eventbridge.eventbridge_bus_arn
+      }
+    ]
+  })
+}
+
+# route order events put on EB to cloud watch
 resource "aws_cloudwatch_log_group" "orders_events" {
   name = "/aws/events/${module.eventbridge.eventbridge_bus_name}"
   retention_in_days = 7
