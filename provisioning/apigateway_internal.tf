@@ -57,7 +57,9 @@ resource "aws_api_gateway_method_settings" "settings" {
   }
 }
 
-# API gateway role with permissions to put events on event bridge
+# API gateway role created with a policy that allows the api gateway principal to assume a role.
+# The temporary security credentials created by AssumeRole can be used to make API calls to 
+# other AWS services like event bridge and cloud watch
 resource "aws_iam_role" "internal_events_api_role" {
   name = "${local.stack_name}-internal-apigateway-role"
 
@@ -70,8 +72,7 @@ resource "aws_iam_role" "internal_events_api_role" {
       Principal = {
         Service = "apigateway.amazonaws.com"
       }
-      }
-    ]
+    }]
   })
 
   permissions_boundary = data.aws_iam_policy.boundary.arn
