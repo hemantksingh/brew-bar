@@ -57,9 +57,14 @@ resource "aws_api_gateway_method_settings" "settings" {
   }
 }
 
-# API gateway role created with a policy that allows the api gateway principal to assume a role.
-# The temporary security credentials created by AssumeRole can be used to make API calls to 
-# other AWS services like event bridge and cloud watch
+# Defining an IAM role requires you to specify - who (the principal - human or non-human identity) 
+# can take on (assume) that role and what (IAM policies) they can do in that role. Policies can be 
+# identity based - attached to the principal or resource based - attached to the resource, specifying 
+# which principal can do what with that resource.
+#
+# The following role is created with a trust policy (similar to a resource based policy) that allows
+# the apigateway principal to assume this role. The temporary security credentials created by AssumeRole 
+# can be used to make API calls to other AWS services like event bridge and cloud watch
 resource "aws_iam_role" "internal_events_api_role" {
   name = "${local.stack_name}-internal-apigateway-role"
 
@@ -78,6 +83,7 @@ resource "aws_iam_role" "internal_events_api_role" {
   permissions_boundary = data.aws_iam_policy.boundary.arn
 }
 
+# identity based policy that allows the identity assuming the IAM role to access event bridge
 resource "aws_iam_role_policy_attachment" "internal_apigateway_eventbridge_policy" {
   role       = aws_iam_role.internal_events_api_role.name
   policy_arn = aws_iam_policy.eventbridge_basic.arn
