@@ -17,36 +17,33 @@ loadtest:
 	cd tests/loadtests && \
 	pipenv run locust
 
-REGION?=eu-west-1
+REGION?=eu-west-2
 STACK_PREFIX?=brewbar
-TERRAFORM_DIR=provisioning
-
+TF_DIR=provisioning
+TF_PLAN=$(STACK_PREFIX).$@.tfplan
 
 define tfinit
-	cd $(TERRAFORM_DIR) && terraform init
+	terraform -chdir=$(TF_DIR) init
 endef
 
 stack:
 	$(call tfinit,$@) && \
-	terraform plan \
+	terraform -chdir=$(TF_DIR) plan \
 		-var stack_prefix=$(STACK_PREFIX) \
 		-var region=$(REGION) \
 		-var permissions_boundary_policy=$(PERMISSIONS_BOUNDARY_POLICY) \
-		-out $@.tfplan
+		-out $(TF_PLAN)
 ifeq ($(APPLY), true)
-	cd $(TERRAFORM_DIR) && \
-	terraform apply $@.tfplan
+	terraform -chdir=$(TF_DIR) apply $(TF_PLAN)
 else
 	@echo Skipping apply ...
 endif
 
 destroy-stack:
-	cd $(TERRAFORM_DIR) && \
-	terraform destroy \
+	terraform -chdir=$(TF_DIR) destroy \
 		-var stack_prefix=$(STACK_PREFIX) \
 		-var region=$(REGION) \
 		-var permissions_boundary_policy=$(PERMISSIONS_BOUNDARY_POLICY)
 
 output:
-	cd $(TERRAFORM_DIR) && \
-	terraform output
+	terraform -chdir=$(TF_DIR) output
