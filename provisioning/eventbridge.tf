@@ -34,8 +34,7 @@ module "eventbridge" {
 #   role_description = ""
 #   role_name = ""
 #   role_path =""
-    role_permissions_boundary = data.aws_iam_policy.boundary.arn
-  
+    role_permissions_boundary = length(data.aws_iam_policy.boundary) == 0 ? null: data.aws_iam_policy.boundary[0].arn
   # insert the 6 required variables here
 
   tags = {

@@ -55,7 +55,7 @@ resource "aws_iam_role" "lambda_exec_role" {
     ]
   })
 
-  permissions_boundary = data.aws_iam_policy.boundary.arn
+  permissions_boundary = length(data.aws_iam_policy.boundary) == 0 ? null: data.aws_iam_policy.boundary[0].arn
 }
 
 resource "aws_iam_role_policy_attachment" "lambda_policy" {

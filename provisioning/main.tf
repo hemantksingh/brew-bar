@@ -6,9 +6,16 @@ variable "stack_prefix" {
   type    = string
 }
 
+variable "use_permissions_boundary" {
+  type = bool
+  description = "Whether use a permission boundary while creating an IAM role?"
+  default = false
+}
+
 variable "permissions_boundary_policy" {
   type        = string
   description = "Permissions boundary policy to be used for the role creation"
+  default = null
 }
 
 variable "environment" {
@@ -51,5 +58,6 @@ data "aws_caller_identity" "current" {
 }
 
 data "aws_iam_policy" "boundary" {
+  count = var.use_permissions_boundary ? 1: 0
   arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:policy/${var.permissions_boundary_policy}"
 }

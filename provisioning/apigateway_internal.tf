@@ -79,8 +79,7 @@ resource "aws_iam_role" "internal_events_api_role" {
       }
     }]
   })
-
-  permissions_boundary = data.aws_iam_policy.boundary.arn
+  permissions_boundary = length(data.aws_iam_policy.boundary) == 0 ? null: data.aws_iam_policy.boundary[0].arn
 }
 
 # identity based policy that allows the identity assuming the IAM role to access event bridge
